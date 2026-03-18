@@ -1,0 +1,9 @@
+[[redirects]]
+  from = "/"
+    to = "/index-prod.html"
+      status = 200
+
+      [[redirects]]
+        from = "/admin"
+          to = "/admin-prod.html"
+            status = 200
