@@ -100,7 +100,7 @@
   .btn-del-on   { background:var(--teal); color:#fff; box-shadow:0 2px 8px rgba(13,148,136,0.3); }
   /* trash/restore */
   .btn-trash    { background:var(--red-light); color:#991b1b; border:1.5px solid #fca5a5; flex:0; min-width:40px; }
-  .btn-restore  { background:var(--blue-light); color:var(--blue2); }
+  .btn-delete-perm { background:var(--red); color:#fff; box-shadow:0 2px 8px rgba(239,68,68,0.3); }
 
   .empty-state { text-align:center; padding:48px 0; color:var(--muted); }
   .empty-state .icon { font-size:48px; margin-bottom:8px; }
@@ -199,7 +199,10 @@ function renderOrderCard(o) {
 
   let actions = '';
   if (isTrash) {
-    actions = `<button class="action-btn btn-restore" onclick="restoreOrder('${o.id}')">↩️ กู้คืน</button>`;
+    actions = `
+      <button class="action-btn btn-restore" onclick="restoreOrder('${o.id}')">↩️ กู้คืน</button>
+      <button class="action-btn btn-delete-perm" onclick="deleteForever('${o.id}')">🗑️ ลบถาวร</button>
+    `;
   } else {
     actions = `
       <button class="action-btn ${o.paid ? 'btn-pay-on' : 'btn-pay-off'}"
@@ -282,6 +285,11 @@ window.togglePaid      = (id, paid)      => updateDoc(doc(db,'orders',id), { pai
 window.toggleDelivered = (id, delivered) => updateDoc(doc(db,'orders',id), { delivered });
 window.trashOrder      = id => updateDoc(doc(db,'orders',id), { deleted: true });
 window.restoreOrder    = id => updateDoc(doc(db,'orders',id), { deleted: false });
+window.deleteForever   = async (id) => {
+  if (!confirm('ลบถาวรเลยนะ? กู้คืนไม่ได้แล้ว')) return;
+  const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await deleteDoc(doc(db,'orders',id));
+};
 
 window.switchTab = function(tab) {
   currentTab = tab;
