@@ -105,9 +105,101 @@
   .empty-state { text-align:center; padding:48px 0; color:var(--muted); }
   .empty-state .icon { font-size:48px; margin-bottom:8px; }
   .empty-state p { font-size:13px; }
+  /* PIN SCREEN */
+  .pin-screen {
+    position: fixed; inset: 0; z-index: 999;
+    background: linear-gradient(160deg, #0284c7 0%, #0d9488 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .pin-screen.hidden { display: none; }
+  .pin-logo { font-size: 52px; margin-bottom: 8px; }
+  .pin-title { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .pin-sub { color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 32px; }
+  .pin-dots { display: flex; gap: 14px; margin-bottom: 32px; }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
+    background: transparent; transition: all 0.2s;
+  }
+  .pin-dot.filled { background: #fff; border-color: #fff; transform: scale(1.1); }
+  .pin-error { color: #fca5a5; font-size: 13px; font-weight: 600; margin-bottom: 16px; min-height: 20px; }
+  .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+  .pin-key {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 16px;
+    padding: 18px; font-size: 22px; font-weight: 700; color: #fff;
+    cursor: pointer; transition: all 0.15s; font-family: 'Mitr', sans-serif;
+    backdrop-filter: blur(4px);
+  }
+  .pin-key:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+  .pin-key:active { transform: scale(0.95); }
+  .pin-key.del { font-size: 18px; }
+  .pin-key.empty { background: transparent; cursor: default; }
+  .pin-key.empty:hover { transform: none; }
 </style>
 </head>
 <body>
+
+<!-- PIN SCREEN -->
+<div class="pin-screen" id="pin-screen">
+  <div class="pin-logo">🔐</div>
+  <div class="pin-title">Admin Panel</div>
+  <div class="pin-sub">กรอก PIN 4 หลักเพื่อเข้าใช้งาน</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="dot-0"></div>
+    <div class="pin-dot" id="dot-1"></div>
+    <div class="pin-dot" id="dot-2"></div>
+    <div class="pin-dot" id="dot-3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="pinPress('1')">1</button>
+    <button class="pin-key" onclick="pinPress('2')">2</button>
+    <button class="pin-key" onclick="pinPress('3')">3</button>
+    <button class="pin-key" onclick="pinPress('4')">4</button>
+    <button class="pin-key" onclick="pinPress('5')">5</button>
+    <button class="pin-key" onclick="pinPress('6')">6</button>
+    <button class="pin-key" onclick="pinPress('7')">7</button>
+    <button class="pin-key" onclick="pinPress('8')">8</button>
+    <button class="pin-key" onclick="pinPress('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinPress('0')">0</button>
+    <button class="pin-key del" onclick="pinDelete()">⌫</button>
+  </div>
+</div>
+
+<script>
+// PIN LOGIC (non-module, runs immediately)
+const CORRECT_PIN = '5665'; // ← เปลี่ยน PIN ตรงนี้
+let pinInput = '';
+
+function pinPress(num) {
+  if (pinInput.length >= 4) return;
+  pinInput += num;
+  document.getElementById(`dot-${pinInput.length - 1}`).classList.add('filled');
+  document.getElementById('pin-error').textContent = '';
+  if (pinInput.length === 4) {
+    setTimeout(checkPin, 200);
+  }
+}
+
+function pinDelete() {
+  if (pinInput.length === 0) return;
+  document.getElementById(`dot-${pinInput.length - 1}`).classList.remove('filled');
+  pinInput = pinInput.slice(0, -1);
+}
+
+function checkPin() {
+  if (pinInput === CORRECT_PIN) {
+    document.getElementById('pin-screen').classList.add('hidden');
+  } else {
+    document.getElementById('pin-error').textContent = '❌ PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง';
+    pinInput = '';
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
+  }
+}
+</script>
 
 <div class="header">
   <div class="header-icon">🔧</div>
