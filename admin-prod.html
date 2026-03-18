@@ -4,71 +4,103 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — น้ำยา</title>
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --pink: #f472b6; --pink-light: #fce7f3; --pink-dark: #be185d;
-    --purple: #a855f7; --purple-light: #f3e8ff;
+    --blue: #0284c7; --blue2: #0369a1; --blue-light: #e0f2fe;
+    --teal: #0d9488; --teal-light: #d1fae5;
     --green: #10b981; --green-light: #d1fae5;
     --red: #ef4444; --red-light: #fee2e2;
-    --blue: #3b82f6; --blue-light: #dbeafe;
     --orange: #f97316; --orange-light: #ffedd5;
-    --bg: #f8fafc; --card: #ffffff; --text: #1e1b2e; --muted: #6b7280; --border: #e5e7eb;
+    --yellow: #f59e0b; --yellow-light: #fef3c7;
+    --purple: #a855f7; --purple-light: #f3e8ff;
+    --pink-dark: #be185d;
+    --bg: #f0f9ff; --card: #ffffff; --text: #0c4a6e; --muted: #7dd3fc; --border: #bae6fd;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); }
+  body { font-family: 'Mitr', sans-serif; background: var(--bg); color: var(--text); }
 
-  .header { background: linear-gradient(135deg, #1e1b2e 0%, #3b0764 100%); padding: 20px 16px; display:flex; align-items:center; gap:12px; }
+  .header {
+    background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    padding: 20px 16px; display:flex; align-items:center; gap:12px;
+  }
   .header-icon { font-size: 28px; }
   .header h1 { color: #fff; font-size: 18px; font-weight: 700; }
-  .header p  { color: rgba(255,255,255,0.5); font-size: 11px; }
+  .header p  { color: rgba(255,255,255,0.6); font-size: 11px; }
 
-  .tabs { display:flex; background:#fff; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:50; }
-  .tab { flex:1; padding:12px 8px; text-align:center; font-size:13px; font-weight:600; cursor:pointer; color:var(--muted); background:none; border:none; border-bottom:3px solid transparent; transition:all 0.2s; font-family:'Prompt',sans-serif; }
-  .tab.active { color:var(--pink-dark); border-bottom-color:var(--pink-dark); }
+  /* TABS - scrollable */
+  .tabs-wrap { background:#fff; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:50; overflow-x:auto; }
+  .tabs { display:flex; min-width:max-content; }
+  .tab {
+    padding:12px 14px; text-align:center; font-size:12px; font-weight:600;
+    cursor:pointer; color:var(--muted); background:none; border:none;
+    border-bottom:3px solid transparent; transition:all 0.2s;
+    font-family:'Mitr',sans-serif; white-space:nowrap;
+  }
+  .tab.active { color:var(--blue2); border-bottom-color:var(--blue2); }
 
   .container { max-width:480px; margin:0 auto; padding:12px 12px 80px; }
 
-  .stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:16px; }
-  .stat-card { background:var(--card); border-radius:14px; padding:12px 10px; text-align:center; border:1px solid var(--border); }
-  .stat-num { font-size:22px; font-weight:700; }
-  .stat-label { font-size:10px; color:var(--muted); margin-top:2px; }
-  .stat-card.pink .stat-num   { color:var(--pink-dark); }
-  .stat-card.green .stat-num  { color:var(--green); }
-  .stat-card.purple .stat-num { color:var(--purple); }
+  /* STATS */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
+  .stat-card { background:var(--card); border-radius:12px; padding:10px 6px; text-align:center; border:1px solid var(--border); }
+  .stat-num { font-size:18px; font-weight:700; }
+  .stat-label { font-size:9px; color:var(--muted); margin-top:1px; }
+  .stat-card.blue   .stat-num { color:var(--blue2); }
+  .stat-card.yellow .stat-num { color:var(--yellow); }
+  .stat-card.orange .stat-num { color:var(--orange); }
+  .stat-card.green  .stat-num { color:var(--green); }
 
+  /* ORDER CARD */
   .order-card { background:var(--card); border-radius:16px; border:1.5px solid var(--border); margin-bottom:10px; overflow:hidden; transition:box-shadow 0.2s; }
-  .order-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
-  .order-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); }
-  .order-num  { font-size:14px; font-weight:700; color:var(--purple); }
-  .order-name { font-size:13px; font-weight:600; margin-top:1px; }
-  .order-time { font-size:10px; color:var(--muted); }
+  .order-card:hover { box-shadow:0 4px 16px rgba(2,132,199,0.1); }
+  .order-header { padding:12px 14px; border-bottom:1px solid var(--border); }
+  .order-header-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px; }
+  .order-num  { font-size:15px; font-weight:700; color:var(--blue2); }
+  .order-name { font-size:13px; font-weight:600; margin-top:1px; color:var(--text); }
+  .order-time { font-size:10px; color:var(--muted); margin-top:2px; }
 
-  .badge-row { display:flex; gap:6px; flex-wrap:wrap; }
-  .status-badge { font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; }
-  .status-badge.pending   { background:#fef3c7; color:#92400e; }
-  .status-badge.paid      { background:var(--green-light); color:#065f46; }
-  .status-badge.trash     { background:var(--red-light); color:#991b1b; }
-  .status-badge.cash      { background:var(--orange-light); color:#9a3412; }
-  .status-badge.qr        { background:var(--blue-light); color:#1e40af; }
-  .status-badge.collected { background:var(--green-light); color:#065f46; }
-  .status-badge.not-collected { background:#f3f4f6; color:#6b7280; }
+  /* BADGES */
+  .badge-row { display:flex; gap:5px; flex-wrap:wrap; }
+  .badge {
+    font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px;
+    display:inline-flex; align-items:center; gap:3px;
+  }
+  .badge.cash      { background:var(--orange-light); color:#9a3412; }
+  .badge.qr        { background:var(--blue-light); color:var(--blue2); }
+  .badge.paid      { background:var(--green-light); color:#065f46; }
+  .badge.unpaid    { background:var(--yellow-light); color:#92400e; }
+  .badge.delivered { background:var(--teal-light); color:#0f766e; }
+  .badge.pending-d { background:#f3f4f6; color:#6b7280; }
+  .badge.done      { background:var(--green-light); color:#065f46; }
+  .badge.trash-b   { background:var(--red-light); color:#991b1b; }
 
+  /* ITEMS */
   .order-items { padding:10px 14px; }
-  .order-item-row { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); padding:3px 0; font-family:'Sarabun',sans-serif; }
+  .order-item-row { display:flex; justify-content:space-between; font-size:12px; color:#64748b; padding:3px 0; font-family:'Sarabun',sans-serif; }
   .discount-line { color:var(--green); font-weight:600; }
   .order-total-row { display:flex; justify-content:space-between; font-size:14px; font-weight:700; padding:8px 14px; border-top:1px solid var(--border); background:var(--bg); }
-  .order-total-row span:last-child { color:var(--pink-dark); }
+  .order-total-row span:last-child { color:var(--blue2); }
 
+  /* ACTIONS */
   .order-actions { display:flex; gap:6px; padding:10px 14px; border-top:1px solid var(--border); flex-wrap:wrap; }
-  .action-btn { flex:1; min-width:80px; padding:8px 6px; border-radius:10px; border:none; font-size:11px; font-weight:600; font-family:'Prompt',sans-serif; cursor:pointer; transition:opacity 0.2s; text-align:center; }
-  .action-btn:hover { opacity:0.85; }
-  .btn-confirm     { background:var(--green-light); color:#065f46; }
-  .btn-confirmed   { background:var(--green); color:#fff; }
-  .btn-collect     { background:var(--orange-light); color:#9a3412; }
-  .btn-collected   { background:var(--orange); color:#fff; }
-  .btn-trash       { background:var(--red-light); color:#991b1b; }
-  .btn-restore     { background:var(--blue-light); color:#1d4ed8; }
+  .action-btn {
+    flex:1; min-width:90px; padding:9px 6px; border-radius:12px; border:none;
+    font-size:11px; font-weight:600; font-family:'Mitr',sans-serif;
+    cursor:pointer; transition:all 0.2s; text-align:center;
+  }
+  .action-btn:hover { transform:translateY(-1px); opacity:0.9; }
+  .action-btn:active { transform:translateY(0); }
+
+  /* paid states */
+  .btn-pay-off  { background:var(--yellow-light); color:#92400e; border:1.5px solid #fcd34d; }
+  .btn-pay-on   { background:var(--green); color:#fff; box-shadow:0 2px 8px rgba(16,185,129,0.3); }
+  /* delivered states */
+  .btn-del-off  { background:var(--blue-light); color:var(--blue2); border:1.5px solid var(--border); }
+  .btn-del-on   { background:var(--teal); color:#fff; box-shadow:0 2px 8px rgba(13,148,136,0.3); }
+  /* trash/restore */
+  .btn-trash    { background:var(--red-light); color:#991b1b; border:1.5px solid #fca5a5; flex:0; min-width:40px; }
+  .btn-restore  { background:var(--blue-light); color:var(--blue2); }
 
   .empty-state { text-align:center; padding:48px 0; color:var(--muted); }
   .empty-state .icon { font-size:48px; margin-bottom:8px; }
@@ -85,30 +117,24 @@
   </div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('orders')">📋 คำสั่งซื้อ</button>
-  <button class="tab" onclick="switchTab('trash')">🗑️ ถังขยะ</button>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('all')">📋 ทั้งหมด</button>
+    <button class="tab" onclick="switchTab('unpaid')">⏳ รอชำระ</button>
+    <button class="tab" onclick="switchTab('undelivered')">📦 รอจัดส่ง</button>
+    <button class="tab" onclick="switchTab('done')">✅ เสร็จสิ้น</button>
+    <button class="tab" onclick="switchTab('trash')">🗑️ ถังขยะ</button>
+  </div>
 </div>
 
 <div class="container">
-
-  <div id="tab-orders">
-    <div class="stats-grid">
-      <div class="stat-card pink">  <div class="stat-num" id="stat-total">0</div>  <div class="stat-label">ทั้งหมด</div></div>
-      <div class="stat-card green"> <div class="stat-num" id="stat-paid">0</div>   <div class="stat-label">ชำระแล้ว</div></div>
-      <div class="stat-card purple"><div class="stat-num" id="stat-revenue">฿0</div><div class="stat-label">ยอดรวม</div></div>
-    </div>
-    <div id="orders-list">
-      <div class="empty-state"><div class="icon">📭</div><p>ยังไม่มีคำสั่งซื้อ</p></div>
-    </div>
+  <div class="stats-grid">
+    <div class="stat-card blue">  <div class="stat-num" id="stat-total">0</div>   <div class="stat-label">ทั้งหมด</div></div>
+    <div class="stat-card yellow"><div class="stat-num" id="stat-unpaid">0</div>  <div class="stat-label">รอชำระ</div></div>
+    <div class="stat-card orange"><div class="stat-num" id="stat-undel">0</div>   <div class="stat-label">รอส่ง</div></div>
+    <div class="stat-card green"> <div class="stat-num" id="stat-revenue">฿0</div><div class="stat-label">ยอดรวม</div></div>
   </div>
-
-  <div id="tab-trash" style="display:none">
-    <div id="trash-list">
-      <div class="empty-state"><div class="icon">✨</div><p>ถังขยะว่างเปล่า</p></div>
-    </div>
-  </div>
-
+  <div id="orders-container"></div>
 </div>
 
 <script type="module">
@@ -128,6 +154,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 let allOrders = [];
+let currentTab = 'all';
 
 function formatTime(ts) {
   if (!ts) return '';
@@ -135,44 +162,76 @@ function formatTime(ts) {
   return d.toLocaleString('th-TH', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
 }
 
-function renderOrderCard(o, isTrash) {
+function getFilteredOrders() {
+  const active = allOrders.filter(o => !o.deleted);
+  switch(currentTab) {
+    case 'all':         return active;
+    case 'unpaid':      return active.filter(o => !o.paid);
+    case 'undelivered': return active.filter(o => !o.delivered);
+    case 'done':        return active.filter(o => o.paid && o.delivered);
+    case 'trash':       return allOrders.filter(o => o.deleted);
+    default:            return active;
+  }
+}
+
+function renderOrderCard(o) {
+  const isTrash = o.deleted;
+
   const items = (o.items||[]).map(i =>
     `<div class="order-item-row"><span>${i.name} ×${i.qty}</span><span>฿${(i.subtotal||i.price*i.qty).toLocaleString()}</span></div>`
   ).join('');
-
   const discountLine = (o.discount > 0)
-    ? `<div class="order-item-row discount-line"><span>🎉 ส่วนลดบริส</span><span>-฿${o.discount}</span></div>`
-    : '';
+    ? `<div class="order-item-row discount-line"><span>🎉 ส่วนลด</span><span>-฿${o.discount}</span></div>` : '';
 
-  const payMethod = o.paymentMethod === 'cash' ? '💵 เงินสด' : '📱 QR Code';
-  const payBadgeClass = o.paymentMethod === 'cash' ? 'cash' : 'qr';
-  const collectedBadge = o.collected
-    ? '<span class="status-badge collected">📦 รับของแล้ว</span>'
-    : '<span class="status-badge not-collected">⏳ ยังไม่รับ</span>';
+  const payBadge = o.paymentMethod==='cash'
+    ? `<span class="badge cash">💵 เงินสด</span>`
+    : `<span class="badge qr">📱 QR</span>`;
 
-  const actions = isTrash
-    ? `<button class="action-btn btn-restore" onclick="restoreOrder('${o.id}')">↩️ กู้คืน</button>`
-    : `
-      <button class="action-btn ${o.paid?'btn-confirmed':'btn-confirm'}" onclick="togglePaid('${o.id}',${!o.paid})">
+  const paidBadge = o.paid
+    ? `<span class="badge paid">✅ ชำระแล้ว</span>`
+    : `<span class="badge unpaid">⏳ รอชำระ</span>`;
+
+  const deliveredBadge = o.delivered
+    ? `<span class="badge delivered">📦 ส่งแล้ว</span>`
+    : `<span class="badge pending-d">🕐 รอส่ง</span>`;
+
+  const doneBadge = (o.paid && o.delivered) ? `<span class="badge done">🎉 เสร็จสิ้น</span>` : '';
+
+  let actions = '';
+  if (isTrash) {
+    actions = `<button class="action-btn btn-restore" onclick="restoreOrder('${o.id}')">↩️ กู้คืน</button>`;
+  } else {
+    actions = `
+      <button class="action-btn ${o.paid ? 'btn-pay-on' : 'btn-pay-off'}"
+        onclick="togglePaid('${o.id}', ${!o.paid})">
         ${o.paid ? '✅ ชำระแล้ว' : '💳 ยืนยันชำระ'}
+      </button>
+      <button class="action-btn ${o.delivered ? 'btn-del-on' : 'btn-del-off'}"
+        onclick="toggleDelivered('${o.id}', ${!o.delivered})">
+        ${o.delivered ? '📦 ส่งแล้ว' : '🚚 ยืนยันจัดส่ง'}
       </button>
       <button class="action-btn btn-trash" onclick="trashOrder('${o.id}')">🗑️</button>
     `;
+  }
 
   return `
     <div class="order-card">
       <div class="order-header">
-        <div>
-          <div class="order-num">#${o.orderNumber||'???'}</div>
-          <div class="order-name">${o.customerName||'-'}</div>
-          <div class="order-time">${formatTime(o.createdAt)}</div>
+        <div class="order-header-top">
+          <div>
+            <div class="order-num">#${o.orderNumber||'???'}</div>
+            <div class="order-name">${o.customerName||'-'}</div>
+            <div class="order-time">${formatTime(o.createdAt)}</div>
+          </div>
+          <div class="badge-row">
+            ${payBadge}
+            ${isTrash ? '<span class="badge trash-b">🗑️ ลบ</span>' : ''}
+          </div>
         </div>
         <div class="badge-row">
-          <span class="status-badge ${payBadgeClass}">${payMethod}</span>
-          <span class="status-badge ${isTrash?'trash':o.paid?'paid':'pending'}">
-            ${isTrash ? '🗑️ ลบ' : o.paid ? '✅ ชำระแล้ว' : '⏳ รอชำระ'}
-          </span>
-          ${!isTrash ? '' : ''}
+          ${!isTrash ? paidBadge : ''}
+          ${!isTrash ? deliveredBadge : ''}
+          ${doneBadge}
         </div>
       </div>
       <div class="order-items">${items}${discountLine}</div>
@@ -182,24 +241,31 @@ function renderOrderCard(o, isTrash) {
 }
 
 function renderOrders() {
-  const active = allOrders.filter(o => !o.deleted);
-  const trash  = allOrders.filter(o =>  o.deleted);
+  const filtered = getFilteredOrders();
+  const container = document.getElementById('orders-container');
 
-  document.getElementById('orders-list').innerHTML = active.length
-    ? active.map(o => renderOrderCard(o, false)).join('')
-    : '<div class="empty-state"><div class="icon">📭</div><p>ยังไม่มีคำสั่งซื้อ</p></div>';
-
-  document.getElementById('trash-list').innerHTML = trash.length
-    ? trash.map(o => renderOrderCard(o, true)).join('')
-    : '<div class="empty-state"><div class="icon">✨</div><p>ถังขยะว่างเปล่า</p></div>';
+  if (filtered.length === 0) {
+    const emptyMsg = {
+      all: 'ยังไม่มีคำสั่งซื้อ',
+      unpaid: 'ไม่มี order รอชำระ 🎉',
+      undelivered: 'ไม่มี order รอจัดส่ง 🎉',
+      done: 'ยังไม่มี order เสร็จสิ้น',
+      trash: 'ถังขยะว่างเปล่า'
+    };
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${emptyMsg[currentTab]||''}</p></div>`;
+  } else {
+    container.innerHTML = filtered.map(o => renderOrderCard(o)).join('');
+  }
 }
 
 function updateStats() {
-  const active  = allOrders.filter(o => !o.deleted);
-  const paid    = active.filter(o => o.paid);
-  const revenue = paid.reduce((s,o) => s+(o.total||0), 0);
+  const active = allOrders.filter(o => !o.deleted);
+  const unpaid = active.filter(o => !o.paid);
+  const undel  = active.filter(o => !o.delivered);
+  const revenue = active.filter(o => o.paid).reduce((s,o) => s+(o.total||0), 0);
   document.getElementById('stat-total').textContent   = active.length;
-  document.getElementById('stat-paid').textContent    = paid.length;
+  document.getElementById('stat-unpaid').textContent  = unpaid.length;
+  document.getElementById('stat-undel').textContent   = undel.length;
   document.getElementById('stat-revenue').textContent = `฿${revenue.toLocaleString()}`;
 }
 
@@ -212,17 +278,17 @@ function listenOrders() {
   });
 }
 
-window.togglePaid  = (id, paid) => updateDoc(doc(db,'orders',id), { paid, status: paid?'confirmed':'pending' });
-window.trashOrder   = id => updateDoc(doc(db,'orders',id), { deleted: true });
-window.restoreOrder = id => updateDoc(doc(db,'orders',id), { deleted: false });
+window.togglePaid      = (id, paid)      => updateDoc(doc(db,'orders',id), { paid, status: paid?'confirmed':'pending' });
+window.toggleDelivered = (id, delivered) => updateDoc(doc(db,'orders',id), { delivered });
+window.trashOrder      = id => updateDoc(doc(db,'orders',id), { deleted: true });
+window.restoreOrder    = id => updateDoc(doc(db,'orders',id), { deleted: false });
 
 window.switchTab = function(tab) {
-  ['orders','trash'].forEach(t => {
-    document.getElementById(`tab-${t}`).style.display = t===tab ? 'block' : 'none';
-  });
+  currentTab = tab;
   document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['orders','trash'][i]===tab);
+    el.classList.toggle('active', ['all','unpaid','undelivered','done','trash'][i]===tab);
   });
+  renderOrders();
 };
 
 listenOrders();
