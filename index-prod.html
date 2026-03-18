@@ -15,8 +15,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  .env-banner { background: #fef08a; color: #713f12; text-align: center; padding: 6px; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
-
   .header { background: linear-gradient(135deg, #be185d 0%, #9333ea 100%); padding: 20px 16px 28px; text-align: center; position: relative; overflow: hidden; }
   .header::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:rgba(255,255,255,0.08); border-radius:50%; }
   .header::after  { content:''; position:absolute; bottom:-30px; left:-20px; width:120px; height:120px; background:rgba(255,255,255,0.06); border-radius:50%; }
@@ -48,6 +46,14 @@
   .qty-btn:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
   .qty-num { font-size:15px; font-weight:700; min-width:24px; text-align:center; }
 
+  /* DISCOUNT BANNER */
+  .discount-banner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; border-radius: 12px; padding: 10px 14px;
+    font-size: 12px; font-weight: 600; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
   .order-float { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:#fff; border-top:2px solid var(--border); padding:12px 16px; box-shadow:0 -8px 32px rgba(190,24,93,0.1); z-index:100; }
   .order-summary-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
   .order-count { font-size:13px; color:var(--muted); }
@@ -66,15 +72,39 @@
   .order-item-name { font-weight:500; flex:1; }
   .order-item-qty { color:var(--muted); margin:0 12px; }
   .order-item-price { font-weight:600; color:var(--pink-dark); }
+
+  /* DISCOUNT ROW */
+  .discount-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; color:var(--green); font-weight:600; border-bottom:1px solid var(--border); }
+
   .total-row { display:flex; justify-content:space-between; padding:14px 0 0; font-size:16px; font-weight:700; }
   .total-row .amount { color:var(--pink-dark); font-size:20px; }
   .form-group { margin:16px 0; }
   .form-label { font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; display:block; }
   .form-input { width:100%; border:2px solid var(--border); border-radius:12px; padding:12px 14px; font-size:14px; font-family:'Prompt',sans-serif; outline:none; transition:border-color 0.2s; }
   .form-input:focus { border-color:var(--pink); }
+
+  /* PAYMENT METHOD SELECTOR */
+  .payment-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+  .payment-option {
+    border:2px solid var(--border); border-radius:14px; padding:14px 10px;
+    text-align:center; cursor:pointer; transition:all 0.2s; background:#fff;
+    font-family:'Prompt',sans-serif;
+  }
+  .payment-option.selected { border-color:var(--pink); background:var(--pink-light); }
+  .payment-option .icon { font-size:28px; margin-bottom:6px; display:block; }
+  .payment-option .label { font-size:13px; font-weight:600; color:var(--text); }
+  .payment-option .sublabel { font-size:10px; color:var(--muted); margin-top:2px; }
+
   .qr-section { background:var(--pink-light); border-radius:16px; padding:16px; text-align:center; margin:16px 0; }
+  .qr-section img.qr-img { width:200px; height:200px; border-radius:12px; margin:8px auto; display:block; object-fit:contain; background:#fff; }
   .qr-amount { font-size:22px; font-weight:700; color:var(--pink-dark); margin:8px 0 4px; }
   .qr-name { font-size:13px; color:var(--muted); }
+
+  .cash-section { background:#f0fdf4; border:2px solid #bbf7d0; border-radius:16px; padding:20px; text-align:center; margin:16px 0; }
+  .cash-section .cash-icon { font-size:48px; margin-bottom:8px; }
+  .cash-section p { font-size:13px; color:#166534; font-weight:600; }
+  .cash-section .cash-amount { font-size:24px; font-weight:700; color:#15803d; margin:8px 0; }
+
   .confirm-btn { width:100%; background:var(--green); color:#fff; border:none; border-radius:14px; padding:14px; font-size:15px; font-weight:700; font-family:'Prompt',sans-serif; cursor:pointer; margin-top:8px; }
   .cancel-btn { width:100%; background:none; border:none; color:var(--muted); font-family:'Prompt',sans-serif; font-size:13px; margin-top:10px; cursor:pointer; padding:6px; }
   .success-screen { display:none; text-align:center; padding:20px 0; }
@@ -87,8 +117,6 @@
 </head>
 <body>
 
-
-
 <div class="header">
   <div class="header-badge">🧺 PRE-ORDER</div>
   <h1>น้ำยาซักผ้า & ปรับผ้านุ่ม</h1>
@@ -97,7 +125,8 @@
 
 <div class="container">
   <div class="section-title"><span>🔵 บริส เอกเซล น้ำยาซักผ้า</span><div class="line"></div></div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;font-family:'Sarabun',sans-serif">620-670 มล. | 55 บาท/ถุง | 5 ถุง = 270 บาท</p>
+  <div class="discount-banner">🎉 ซื้อครบทุก 5 ถุง ลด 5 บาท (รวมทุกสูตร)</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;font-family:'Sarabun',sans-serif">620-670 มล. | 55 บาท/ถุง</p>
   <div class="product-grid" id="detergent-grid"></div>
 
   <div class="section-title"><span>🌸 Fineline ปรับผ้านุ่ม</span><div class="line"></div></div>
@@ -117,42 +146,83 @@
   <div class="modal">
     <div class="modal-handle"></div>
 
+    <!-- STEP 1: SUMMARY -->
     <div id="step-summary">
       <div class="modal-title">🛒 สรุปรายการ</div>
       <div id="modal-order-list"></div>
+      <div id="modal-discount-row" style="display:none" class="discount-row">
+        <span>🎉 ส่วนลดบริส</span>
+        <span id="modal-discount-amount">-฿0</span>
+      </div>
       <div class="total-row"><span>ยอดรวม</span><span class="amount" id="modal-total">฿0</span></div>
       <div class="form-group">
         <label class="form-label">ชื่อของคุณ *</label>
         <input class="form-input" id="customer-name" type="text" placeholder="เช่น สมใจ, แผนก HR" maxlength="50">
       </div>
+
+      <!-- PAYMENT METHOD -->
+      <div class="form-label" style="margin-top:16px">วิธีชำระเงิน *</div>
+      <div class="payment-options">
+        <div class="payment-option selected" id="opt-qr" onclick="selectPayment('qr')">
+          <span class="icon">📱</span>
+          <div class="label">QR Code</div>
+          <div class="sublabel">PromptPay</div>
+        </div>
+        <div class="payment-option" id="opt-cash" onclick="selectPayment('cash')">
+          <span class="icon">💵</span>
+          <div class="label">เงินสด</div>
+          <div class="sublabel">ชำระที่แม่ค้า</div>
+        </div>
+      </div>
+
       <button class="checkout-btn" onclick="goToPayment()" style="margin-top:8px">ไปชำระเงิน →</button>
       <button class="cancel-btn" onclick="closeModal()">ยกเลิก</button>
     </div>
 
+    <!-- STEP 2: PAYMENT -->
     <div id="step-payment" style="display:none">
       <div class="modal-title">💳 ชำระเงิน</div>
-      <div class="qr-section">
-        <p style="font-size:12px;color:var(--muted)">สแกน PromptPay</p>
-        <!--
-          ใส่รูป QR จริง: แทนบล็อกด้านล่างด้วย
-          <img src="qr-promptpay.png" style="width:180px;height:180px;border-radius:12px;margin:8px auto;display:block">
-        -->
-        <div style="width:180px;height:180px;background:#fff;border-radius:12px;margin:8px auto;display:flex;align-items:center;justify-content:center;border:2px dashed var(--pink)">
-          <span style="font-size:40px">📱</span>
+
+      <!-- QR -->
+      <div id="payment-qr">
+        <div class="qr-section">
+          <p style="font-size:12px;color:var(--muted)">สแกน PromptPay</p>
+          <!--
+            วิธีใส่รูป QR จริง:
+            เปลี่ยนบรรทัดด้านล่างเป็น:
+            <img class="qr-img" src="images/qr-promptpay.png" alt="QR PromptPay">
+          -->
+          <img class="qr-img" src="images/qr-promptpay.png" alt="QR PromptPay"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div style="display:none;width:200px;height:200px;background:#fff;border-radius:12px;margin:8px auto;align-items:center;justify-content:center;border:2px dashed var(--pink)">
+            <span style="font-size:40px">📱</span>
+          </div>
+          <div class="qr-amount" id="qr-amount">฿0</div>
+          <div class="qr-name">PromptPay • น.ส. วิภาดา ลีอ่ำ</div>
         </div>
-        <div class="qr-amount" id="qr-amount">฿0</div>
-        <div class="qr-name">PromptPay • [ชื่อเจ้าของ]</div>
       </div>
-      <div id="payment-order-summary" style="font-size:12px;color:var(--muted);background:var(--bg);border-radius:12px;padding:12px;margin-bottom:12px"></div>
-      <button class="confirm-btn" onclick="submitOrder()">✅ แจ้งโอนแล้ว</button>
+
+      <!-- CASH -->
+      <div id="payment-cash" style="display:none">
+        <div class="cash-section">
+          <div class="cash-icon">💵</div>
+          <p>ยอดที่ต้องชำระ</p>
+          <div class="cash-amount" id="cash-amount">฿0</div>
+          <p style="font-size:12px;color:#166534;margin-top:4px">ชำระเงินสดกับแม่ค้าได้เลย</p>
+        </div>
+      </div>
+
+      <div id="payment-order-summary" style="font-size:12px;color:var(--muted);background:var(--bg);border-radius:12px;padding:12px;margin-bottom:12px;line-height:1.8"></div>
+      <button class="confirm-btn" onclick="submitOrder()">✅ ยืนยันคำสั่งซื้อ</button>
       <button class="cancel-btn" onclick="backToSummary()">← แก้ไขรายการ</button>
     </div>
 
+    <!-- SUCCESS -->
     <div class="success-screen" id="step-success">
       <div class="success-icon">🎉</div>
       <div class="success-title">สั่งซื้อสำเร็จ!</div>
       <div class="order-number-badge" id="success-order-num">#001</div>
-      <div class="success-msg">ทีมจะยืนยันการชำระเงินภายใน 24 ชั่วโมง<br>สินค้าจัดส่งต้นเดือนถัดไป 📦</div>
+      <div class="success-msg" id="success-msg">ทีมจะยืนยันการชำระเงินภายใน 24 ชั่วโมง<br>สินค้าจัดส่งต้นเดือนถัดไป 📦</div>
       <button class="checkout-btn" onclick="closeModal()" style="margin-top:20px">เสร็จสิ้น</button>
     </div>
   </div>
@@ -201,16 +271,38 @@ const products = {
 // ================================================================
 
 const cart = {};
-const all  = () => [...products.detergent, ...products.softener];
-const getPrice   = id  => all().find(p => p.id===id)?.price || 0;
-const calcTotal  = ()  => Object.entries(cart).reduce((s,[id,qty]) => s+getPrice(id)*qty, 0);
-const calcCount  = ()  => Object.values(cart).reduce((s,q) => s+q, 0);
+let selectedPayment = 'qr';
+
+const all = () => [...products.detergent, ...products.softener];
+const getPrice = id => all().find(p => p.id===id)?.price || 0;
+const isDetergent = id => id.startsWith('d');
+
+// คำนวณส่วนลด: ทุก 5 ถุงบริส ลด 5 บาท
+function calcDiscount() {
+  const totalDetergent = Object.entries(cart)
+    .filter(([id]) => isDetergent(id))
+    .reduce((s,[,qty]) => s+qty, 0);
+  return Math.floor(totalDetergent / 5) * 5;
+}
+
+function calcSubtotal() {
+  return Object.entries(cart).reduce((s,[id,qty]) => s+getPrice(id)*qty, 0);
+}
+
+function calcTotal() {
+  return calcSubtotal() - calcDiscount();
+}
+
+function calcCount() {
+  return Object.values(cart).reduce((s,q) => s+q, 0);
+}
 
 function updateFloatBar() {
   const count = calcCount();
-  document.getElementById('order-total').textContent  = `฿${calcTotal().toLocaleString()}`;
-  document.getElementById('order-count').textContent  = count>0 ? `${count} รายการ` : 'ยังไม่ได้เลือกสินค้า';
-  document.getElementById('checkout-btn').disabled    = count===0;
+  const total = calcTotal();
+  document.getElementById('order-total').textContent = `฿${total.toLocaleString()}`;
+  document.getElementById('order-count').textContent = count>0 ? `${count} รายการ` : 'ยังไม่ได้เลือกสินค้า';
+  document.getElementById('checkout-btn').disabled = count===0;
 }
 
 window.updateQty = function(id, delta) {
@@ -220,6 +312,12 @@ window.updateQty = function(id, delta) {
   const minus = document.getElementById(`minus-${id}`);
   if (minus) minus.disabled = !cart[id];
   updateFloatBar();
+};
+
+window.selectPayment = function(method) {
+  selectedPayment = method;
+  document.getElementById('opt-qr').classList.toggle('selected', method==='qr');
+  document.getElementById('opt-cash').classList.toggle('selected', method==='cash');
 };
 
 function renderGrid(containerId, items) {
@@ -234,7 +332,7 @@ function renderGrid(containerId, items) {
       </div>
       <div class="product-name">${p.name}</div>
       <div class="product-meta">${p.ml}</div>
-      <div class="product-price">฿${p.price}${p.id.startsWith('d') ? '<span>5 ถุง = ฿270</span>' : ''}</div>
+      <div class="product-price">฿${p.price}</div>
       ${p.inStock
         ? `<div class="qty-control">
              <button class="qty-btn" id="minus-${p.id}" onclick="updateQty('${p.id}',-1)" disabled>−</button>
@@ -246,6 +344,7 @@ function renderGrid(containerId, items) {
 }
 
 window.openCheckout = function() {
+  // render order list
   document.getElementById('modal-order-list').innerHTML = Object.entries(cart).map(([id,qty]) => {
     const p = all().find(x => x.id===id);
     return `<div class="order-item">
@@ -254,7 +353,17 @@ window.openCheckout = function() {
       <span class="order-item-price">฿${(p.price*qty).toLocaleString()}</span>
     </div>`;
   }).join('');
+
+  // discount
+  const discount = calcDiscount();
+  if (discount > 0) {
+    document.getElementById('modal-discount-row').style.display = 'flex';
+    document.getElementById('modal-discount-amount').textContent = `-฿${discount}`;
+  } else {
+    document.getElementById('modal-discount-row').style.display = 'none';
+  }
   document.getElementById('modal-total').textContent = `฿${calcTotal().toLocaleString()}`;
+
   document.getElementById('step-summary').style.display  = 'block';
   document.getElementById('step-payment').style.display  = 'none';
   document.getElementById('step-success').classList.remove('show');
@@ -270,12 +379,25 @@ window.backToSummary = () => {
 window.goToPayment = function() {
   const name = document.getElementById('customer-name').value.trim();
   if (!name) { alert('กรุณากรอกชื่อของคุณ'); return; }
-  document.getElementById('qr-amount').textContent = `฿${calcTotal().toLocaleString()}`;
-  document.getElementById('payment-order-summary').innerHTML =
-    Object.entries(cart).map(([id,qty]) => {
-      const p = all().find(x => x.id===id);
-      return `${p.name} ×${qty} = ฿${(p.price*qty).toLocaleString()}`;
-    }).join('<br>');
+
+  const total = calcTotal();
+  const discount = calcDiscount();
+  document.getElementById('qr-amount').textContent  = `฿${total.toLocaleString()}`;
+  document.getElementById('cash-amount').textContent = `฿${total.toLocaleString()}`;
+
+  // summary text
+  let summaryLines = Object.entries(cart).map(([id,qty]) => {
+    const p = all().find(x => x.id===id);
+    return `${p.name} ×${qty} = ฿${(p.price*qty).toLocaleString()}`;
+  });
+  if (discount > 0) summaryLines.push(`🎉 ส่วนลดบริส = -฿${discount}`);
+  summaryLines.push(`<strong>ยอดรวม = ฿${total.toLocaleString()}</strong>`);
+  document.getElementById('payment-order-summary').innerHTML = summaryLines.join('<br>');
+
+  // show correct payment UI
+  document.getElementById('payment-qr').style.display   = selectedPayment==='qr'   ? 'block' : 'none';
+  document.getElementById('payment-cash').style.display = selectedPayment==='cash'  ? 'block' : 'none';
+
   document.getElementById('step-summary').style.display = 'none';
   document.getElementById('step-payment').style.display = 'block';
 };
@@ -303,17 +425,36 @@ window.submitOrder = async function() {
     const p = all().find(x => x.id===id);
     return { id, name:p.name, qty, price:p.price, subtotal:p.price*qty };
   });
-  const orderNum = await getNextOrderNumber();
+  const discount  = calcDiscount();
+  const subtotal  = calcSubtotal();
+  const total     = calcTotal();
+  const orderNum  = await getNextOrderNumber();
+
   try {
     await addDoc(collection(db,'orders'), {
-      orderNumber: orderNum, customerName: name,
-      items, total: calcTotal(), paid: false, status: 'pending',
+      orderNumber: orderNum,
+      customerName: name,
+      items,
+      subtotal,
+      discount,
+      total,
+      paymentMethod: selectedPayment, // 'qr' or 'cash'
+      paid: false,
+      collected: false,   // ลูกค้ามารับของแล้วหรือยัง
+      status: 'pending',
       createdAt: serverTimestamp()
     });
-  } catch(e) { console.log('Firebase error'); }
+  } catch(e) { console.log('Firebase error', e); }
+
   document.getElementById('success-order-num').textContent = `#${orderNum}`;
+  document.getElementById('success-msg').innerHTML =
+    selectedPayment === 'cash'
+      ? `ชำระเงินสดกับแม่ค้าได้เลยนะคะ 💵<br>สินค้าจัดส่งต้นเดือนถัดไป 📦`
+      : `ทีมจะยืนยันการชำระเงินภายใน 24 ชั่วโมง<br>สินค้าจัดส่งต้นเดือนถัดไป 📦`;
+
   document.getElementById('step-payment').style.display = 'none';
   document.getElementById('step-success').classList.add('show');
+
   Object.keys(cart).forEach(k => delete cart[k]);
   document.querySelectorAll('.qty-num').forEach(el => el.textContent='0');
   document.querySelectorAll('.qty-btn').forEach(el => { if(el.textContent==='−') el.disabled=true; });
