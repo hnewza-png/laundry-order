@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧺 สั่งซื้อน้ำยา</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #e0f2fe;
+    --sky2: #bae6fd;
+    --bubble: #f0f9ff;
+    --mint: #d1fae5;
+    --foam: #ffffff;
+    --blue: #0284c7;
+    --blue2: #0369a1;
+    --teal: #0d9488;
+    --pink: #f9a8d4;
+    --pink2: #ec4899;
+    --green: #10b981;
+    --red: #f43f5e;
+    --text: #0c4a6e;
+    --muted: #7dd3fc;
+    --border: #e0f2fe;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Mitr', sans-serif;
+    background: var(--sky);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BUBBLES BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(186,230,253,0.6) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(209,250,229,0.5) 0%, transparent 50%),
+      radial-gradient(circle at 60% 10%, rgba(249,168,212,0.3) 0%, transparent 40%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* FLOATING BUBBLES */
+  .bubbles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bubble {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(186,230,253,0.3));
+    border: 1px solid rgba(255,255,255,0.6);
+    animation: floatUp linear infinite;
+  }
+  .bubble:nth-child(1)  { width:20px; height:20px; left:10%; animation-duration:8s; animation-delay:0s; }
+  .bubble:nth-child(2)  { width:12px; height:12px; left:25%; animation-duration:10s; animation-delay:2s; }
+  .bubble:nth-child(3)  { width:30px; height:30px; left:40%; animation-duration:12s; animation-delay:1s; }
+  .bubble:nth-child(4)  { width:16px; height:16px; left:60%; animation-duration:9s; animation-delay:3s; }
+  .bubble:nth-child(5)  { width:24px; height:24px; left:75%; animation-duration:11s; animation-delay:0.5s; }
+  .bubble:nth-child(6)  { width:10px; height:10px; left:88%; animation-duration:7s; animation-delay:4s; }
+  @keyframes floatUp {
+    0%   { transform: translateY(110vh) scale(0.8); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) scale(1.1); opacity: 0; }
+  }
+
+  /* HEADER */
+  .header {
+    position: relative; z-index: 1;
+    background: linear-gradient(160deg, #0284c7 0%, #0d9488 100%);
+    padding: 28px 16px 40px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute; bottom: -20px; left: 0; right: 0;
+    height: 40px;
+    background: var(--sky);
+    border-radius: 50% 50% 0 0 / 40px 40px 0 0;
+  }
+  .header-emoji { font-size: 40px; display: block; margin-bottom: 6px; animation: wobble 3s ease-in-out infinite; }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+  .header h1 { color: #fff; font-size: 24px; font-weight: 700; line-height: 1.3; text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .header p  { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 4px; font-weight: 300; }
+
+  /* CONTENT */
+  .container { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 8px 12px 120px; }
+
+  /* SECTION TITLE */
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 600; color: var(--blue2);
+    margin: 20px 0 8px;
+  }
+  .section-title .bubble-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(2,132,199,0.2);
+  }
+  .section-title .line { flex: 1; height: 1px; background: var(--sky2); }
+
+  /* DISCOUNT BANNER */
+  .discount-banner {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; border-radius: 14px; padding: 10px 14px;
+    font-size: 12px; font-weight: 600; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+  }
+
+  /* PRODUCT GRID */
+  .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .product-card {
+    background: var(--foam);
+    border-radius: 18px; padding: 12px;
+    border: 2px solid rgba(224,242,254,0.8);
+    transition: all 0.25s;
+    position: relative; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(2,132,199,0.08);
+  }
+  .product-card::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(186,230,253,0.4), transparent);
+    pointer-events: none;
+  }
+  .product-card:not(.out-of-stock):hover {
+    border-color: var(--blue);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(2,132,199,0.18);
+  }
+  .product-card.out-of-stock { opacity: 0.5; background: #f8fafc; }
+  .out-of-stock-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: var(--red); color: #fff;
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+  }
+  .product-number {
+    position: absolute; top: 8px; left: 8px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    color: #fff; font-size: 10px; font-weight: 700;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .product-img {
+    width: 100%; aspect-ratio: 1; border-radius: 12px;
+    background: var(--sky); margin-bottom: 8px; overflow: hidden;
+  }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .product-img .emoji-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .product-name { font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--text); min-height: 32px; }
+  .product-meta { font-size: 10px; color: var(--muted); margin: 2px 0 6px; font-family: 'Sarabun', sans-serif; }
+  .product-price { font-size: 14px; font-weight: 700; color: var(--blue2); }
+
+  /* QTY CONTROL */
+  .qty-control {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px; background: var(--sky); border-radius: 10px; padding: 4px;
+  }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 8px; border: none;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; line-height: 1;
+  }
+  .qty-btn:hover { transform: scale(1.1); }
+  .qty-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+  .qty-num { font-size: 15px; font-weight: 700; min-width: 24px; text-align: center; color: var(--blue2); }
+
+  /* FLOAT BAR */
+  .order-float {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid var(--sky2);
+    padding: 12px 16px;
+    box-shadow: 0 -8px 32px rgba(2,132,199,0.12);
+    z-index: 100;
+  }
+  .order-summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .order-count { font-size: 13px; color: var(--muted); }
+  .order-total { font-size: 18px; font-weight: 700; color: var(--blue2); }
+  .checkout-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+    color: #fff; border: none; border-radius: 14px;
+    padding: 14px; font-size: 15px; font-weight: 700;
+    font-family: 'Mitr', sans-serif; cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(2,132,199,0.35);
+  }
+  .checkout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2,132,199,0.4); }
+  .checkout-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(12,74,110,0.5); backdrop-filter: blur(4px); z-index: 200; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 28px 28px 0 0;
+    padding: 24px 20px 36px; width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 44px; height: 5px; background: var(--sky2); border-radius: 3px; margin: 0 auto 20px; }
+  .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--blue2); display: flex; align-items: center; gap: 8px; }
+
+  /* ORDER ITEMS IN MODAL */
+  .order-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--sky); font-size: 13px; }
+  .order-item-name { font-weight: 500; flex: 1; color: var(--text); }
+  .order-item-qty { color: var(--muted); margin: 0 12px; }
+  .order-item-price { font-weight: 700; color: var(--blue2); }
+  .discount-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; color: var(--green); font-weight: 600; border-bottom: 1px solid var(--sky); }
+  .total-row { display: flex; justify-content: space-between; padding: 14px 0 0; font-size: 16px; font-weight: 700; }
+  .total-row .amount { color: var(--blue2); font-size: 22px; }
+
+  /* FORM */
+  .form-group { margin: 16px 0; }
+  .form-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; border: 2px solid var(--sky2); border-radius: 14px;
+    padding: 12px 14px; font-size: 14px; font-family: 'Mitr', sans-serif;
+    outline: none; transition: border-color 0.2s; background: var(--bubble);
+    color: var(--text);
+  }
+  .form-input:focus { border-color: var(--blue); background: #fff; }
+
+  /* PAYMENT OPTIONS */
+  .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 20px; }
+  .payment-option {
+    border: 2px solid var(--sky2); border-radius: 16px; padding: 16px 10px;
+    text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bubble);
+    font-family: 'Mitr', sans-serif;
+  }
+  .payment-option.selected {
+    border-color: var(--blue);
+    background: linear-gradient(135deg, rgba(2,132,199,0.08), rgba(13,148,136,0.08));
+    box-shadow: 0 4px 16px rgba(2,132,199,0.15);
+  }
+  .payment-option .icon { font-size: 30px; margin-bottom: 6px; display: block; }
+  .payment-option .label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .payment-option .sublabel { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ORDER BUTTON */
+  .order-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+    color: #fff; border: none; border-radius: 16px;
+    padding: 16px; font-size: 16px; font-weight: 700;
+    font-family: 'Mitr', sans-serif; cursor: pointer;
+    transition: all 0.2s; margin-top: 4px;
+    box-shadow: 0 4px 20px rgba(2,132,199,0.35);
+  }
+  .order-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(2,132,199,0.45); }
+  .cancel-btn { width: 100%; background: none; border: none; color: var(--muted); font-family: 'Mitr', sans-serif; font-size: 13px; margin-top: 10px; cursor: pointer; padding: 6px; }
+
+  /* SUCCESS */
+  .success-screen { display: none; text-align: center; padding: 10px 0; }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 64px; margin-bottom: 8px; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+  .success-title { font-size: 22px; font-weight: 700; color: var(--blue2); }
+  .order-number-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    color: #fff; font-size: 20px; font-weight: 700;
+    padding: 10px 28px; border-radius: 14px; margin: 12px 0;
+    letter-spacing: 2px; box-shadow: 0 4px 16px rgba(2,132,199,0.3);
+  }
+
+  /* SUCCESS RECEIPT */
+  .receipt {
+    background: var(--bubble); border: 2px solid var(--sky2);
+    border-radius: 16px; padding: 16px; margin: 12px 0;
+    text-align: left;
+  }
+  .receipt-title { font-size: 13px; font-weight: 700; color: var(--blue2); margin-bottom: 10px; text-align: center; }
+  .receipt-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px dashed var(--sky2); font-family: 'Sarabun', sans-serif; color: var(--text); }
+  .receipt-row:last-child { border-bottom: none; }
+  .receipt-row.discount { color: var(--green); font-weight: 600; }
+  .receipt-row.total { font-weight: 700; font-size: 14px; color: var(--blue2); border-top: 2px solid var(--sky2); border-bottom: none; margin-top: 4px; padding-top: 8px; }
+  .receipt-row.payment-method { color: var(--teal); font-weight: 600; }
+  .receipt-msg { font-size: 12px; color: var(--muted); line-height: 1.6; text-align: center; margin-top: 8px; }
+
+  .done-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    color: #fff; border: none; border-radius: 14px;
+    padding: 14px; font-size: 15px; font-weight: 700;
+    font-family: 'Mitr', sans-serif; cursor: pointer;
+    margin-top: 16px; box-shadow: 0 4px 16px rgba(2,132,199,0.3);
+  }
+</style>
+</head>
+<body>
+
+<!-- FLOATING BUBBLES -->
+<div style="background:#fef08a;color:#713f12;text-align:center;padding:6px;font-size:12px;font-weight:700;letter-spacing:1px;position:relative;z-index:10">🛠️ DEV ENVIRONMENT</div>
+<div class="bubbles">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+
+<div class="header">
+  <span class="header-emoji">🫧</span>
+  <h1>น้ำยาซักผ้า & ปรับผ้านุ่ม</h1>
+  <p>สั่งได้ทุกวัน • ส่งต้นเดือน</p>
+</div>
+
+<div class="container">
+  <div class="section-title">
+    <div class="bubble-dot"></div>
+    <span>บริส เอกเซล น้ำยาซักผ้า</span>
+    <div class="line"></div>
+  </div>
+  <div class="discount-banner">🎉 ซื้อครบทุก 5 ถุง ลด 5 บาท (รวมทุกสูตร)</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;font-family:'Sarabun',sans-serif">620-670 มล. | 55 บาท/ถุง</p>
+  <div class="product-grid" id="detergent-grid"></div>
+
+  <div class="section-title" style="margin-top:24px">
+    <div class="bubble-dot" style="background:linear-gradient(135deg,#ec4899,#f43f5e)"></div>
+    <span>Fineline ปรับผ้านุ่ม</span>
+    <div class="line"></div>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;font-family:'Sarabun',sans-serif">1300 มล. | 50 บาท/ถุง</p>
+  <div class="product-grid" id="softener-grid"></div>
+</div>
+
+<!-- FLOAT BAR -->
+<div class="order-float">
+  <div class="order-summary-row">
+    <span class="order-count" id="order-count">ยังไม่ได้เลือกสินค้า</span>
+    <span class="order-total" id="order-total">฿0</span>
+  </div>
+  <button class="checkout-btn" id="checkout-btn" onclick="openCheckout()" disabled>
+    🧺 ดูสรุปและสั่งซื้อ →
+  </button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+
+    <!-- STEP: SUMMARY + FORM -->
+    <div id="step-summary">
+      <div class="modal-title">🛒 สรุปรายการ</div>
+      <div id="modal-order-list"></div>
+      <div id="modal-discount-row" style="display:none" class="discount-row">
+        <span>🎉 ส่วนลดบริส</span>
+        <span id="modal-discount-amount">-฿0</span>
+      </div>
+      <div class="total-row">
+        <span>ยอดรวม</span>
+        <span class="amount" id="modal-total">฿0</span>
+      </div>
+
+      <!-- QR CODE -->
+      <div style="text-align:center;margin:16px 0;padding:14px;background:var(--bubble);border-radius:16px;border:1.5px solid var(--sky2)">
+        <p style="font-size:11px;color:var(--muted);margin-bottom:6px">📱 สแกน PromptPay ได้เลย</p>
+        <img src="images/qr-promptpay.png" alt="QR PromptPay"
+          style="width:240px;height:240px;border-radius:12px;object-fit:contain;background:#fff;display:block;margin:0 auto"
+          onerror="this.parentElement.style.display='none'">
+        <p style="font-size:12px;font-weight:600;color:var(--blue2);margin-top:8px">น.ส. วิภาดา ลีอ่ำ</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">ชื่อของคุณ *</label>
+        <input class="form-input" id="customer-name" type="text" placeholder="เช่น สมใจ, แผนก HR" maxlength="50">
+      </div>
+
+      <div class="form-label">วิธีชำระเงิน *</div>
+      <div class="payment-options">
+        <div class="payment-option selected" id="opt-qr" onclick="selectPayment('qr')">
+          <span class="icon">📱</span>
+          <div class="label">QR Code</div>
+          <div class="sublabel">PromptPay</div>
+        </div>
+        <div class="payment-option" id="opt-cash" onclick="selectPayment('cash')">
+          <span class="icon">💵</span>
+          <div class="label">เงินสด</div>
+          <div class="sublabel">ชำระที่แม่ค้า</div>
+        </div>
+      </div>
+
+      <button class="order-submit-btn" onclick="submitOrder()">✅ สั่งสินค้าและบันทึก</button>
+      <button class="cancel-btn" onclick="closeModal()">ยกเลิก</button>
+    </div>
+
+    <!-- SUCCESS + RECEIPT -->
+    <div class="success-screen" id="step-success">
+      <div class="success-icon">🫧✨</div>
+      <div class="success-title">สั่งซื้อสำเร็จ!</div>
+      <div class="order-number-badge" id="success-order-num">#001</div>
+
+      <div class="receipt">
+        <div class="receipt-title">🧾 ใบสรุปคำสั่งซื้อ</div>
+        <div id="receipt-items"></div>
+      </div>
+
+      <div class="receipt-msg" id="success-msg"></div>
+      <button class="done-btn" onclick="closeModal()">เสร็จสิ้น 🎉</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, addDoc, setDoc, updateDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3QBRyrGkw3WEArcTsgjLf8t1zclEp2VU",
+  authDomain: "laundry-order-dev.firebaseapp.com",
+  projectId: "laundry-order-dev",
+  storageBucket: "laundry-order-dev.firebasestorage.app",
+  messagingSenderId: "623853854879",
+  appId: "1:623853854879:web:97cf5897111b71285ff34b"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ================================================================
+// 🛍️ แก้ inStock: true/false ตรงนี้เลยเมื่อของหมด แล้ว push
+// ================================================================
+const products = {
+  detergent: [
+    { id:'d1',  no:1,  name:'บริส สวีทซากุระ & อิงลิชโรส',  ml:'670 มล.', price:55, inStock:false },
+    { id:'d2',  no:2,  name:'บริส เพอร์เพิล ออร์คิด',        ml:'670 มล.', price:55, inStock:false },
+    { id:'d3',  no:3,  name:'บริส แอคทีฟ เฟรช',             ml:'670 มล.', price:55, inStock:true  },
+    { id:'d4',  no:4,  name:'บริส ป้องกันสีตก',              ml:'670 มล.', price:55, inStock:true  },
+    { id:'d5',  no:5,  name:'บริส เฮฟเวน บลอสซั่ม',         ml:'670 มล.', price:55, inStock:true  },
+    { id:'d6',  no:6,  name:'บริส อัลตร้า คลีน',            ml:'620 มล.', price:55, inStock:true  },
+    { id:'d7',  no:7,  name:'บริส พีโอนี่ไวท์เดซี่ (แดง)', ml:'620 มล.', price:55, inStock:true  },
+    { id:'d8',  no:8,  name:'บริส พีโอนี่ไวท์เดซี่ (ส้ม)', ml:'620 มล.', price:55, inStock:false },
+    { id:'d9',  no:9,  name:'บริส พิงค์โรซี่ ฟลอรัล',      ml:'620 มล.', price:55, inStock:true  },
+    { id:'d10', no:10, name:'บริส เฟรชไฮเดรนเยีย',          ml:'620 มล.', price:55, inStock:false },
+    { id:'d11', no:11, name:'บริส แป้งเด็ก',                ml:'620 มล.', price:55, inStock:false },
+  ],
+  softener: [
+    { id:'s1', no:1, name:'Fineline Gentle White',  ml:'1300 มล.', price:50, inStock:true  },
+    { id:'s2', no:2, name:'Fineline Sunshine Gold', ml:'1300 มล.', price:50, inStock:true },
+    { id:'s3', no:3, name:'Fineline Pink Blossom',  ml:'1300 มล.', price:50, inStock:true },
+    { id:'s4', no:4, name:'Fineline Red Romance',   ml:'1300 มล.', price:50, inStock:true },
+  ]
+};
+// ================================================================
+
+const cart = {};
+let selectedPayment = 'qr';
+
+const all        = () => [...products.detergent, ...products.softener];
+const getPrice   = id => all().find(p => p.id===id)?.price || 0;
+const isDetergent = id => id.startsWith('d');
+
+function calcDiscount() {
+  const totalD = Object.entries(cart).filter(([id]) => isDetergent(id)).reduce((s,[,q]) => s+q, 0);
+  return Math.floor(totalD / 5) * 5;
+}
+function calcSubtotal() {
+  return Object.entries(cart).reduce((s,[id,qty]) => s + getPrice(id)*qty, 0);
+}
+function calcTotal() { return calcSubtotal() - calcDiscount(); }
+function calcCount() { return Object.values(cart).reduce((s,q) => s+q, 0); }
+
+function updateFloatBar() {
+  const count = calcCount();
+  document.getElementById('order-total').textContent  = `฿${calcTotal().toLocaleString()}`;
+  document.getElementById('order-count').textContent  = count>0 ? `${count} รายการ` : 'ยังไม่ได้เลือกสินค้า';
+  document.getElementById('checkout-btn').disabled    = count===0;
+}
+
+window.updateQty = function(id, delta) {
+  cart[id] = (cart[id]||0) + delta;
+  if (cart[id]<=0) delete cart[id];
+  document.getElementById(`qty-${id}`).textContent = cart[id]||0;
+  const minus = document.getElementById(`minus-${id}`);
+  if (minus) minus.disabled = !cart[id];
+  updateFloatBar();
+};
+
+window.selectPayment = function(method) {
+  selectedPayment = method;
+  document.getElementById('opt-qr').classList.toggle('selected', method==='qr');
+  document.getElementById('opt-cash').classList.toggle('selected', method==='cash');
+};
+
+function renderGrid(containerId, items) {
+  document.getElementById(containerId).innerHTML = items.map(p => `
+    <div class="product-card ${p.inStock?'':'out-of-stock'}">
+      <div class="product-number">${p.no}</div>
+      ${!p.inStock ? '<div class="out-of-stock-badge">หมด</div>' : ''}
+      <div class="product-img">
+        <img src="images/${p.id}.png" alt="${p.name}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="emoji-fallback" style="display:none">🧴</div>
+      </div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-meta">${p.ml}</div>
+      <div class="product-price">฿${p.price}</div>
+      ${p.inStock
+        ? `<div class="qty-control">
+             <button class="qty-btn" id="minus-${p.id}" onclick="updateQty('${p.id}',-1)" disabled>−</button>
+             <span class="qty-num" id="qty-${p.id}">0</span>
+             <button class="qty-btn" onclick="updateQty('${p.id}',1)">+</button>
+           </div>`
+        : `<div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:center">สินค้าหมดชั่วคราว</div>`}
+    </div>`).join('');
+}
+
+window.openCheckout = function() {
+  document.getElementById('modal-order-list').innerHTML = Object.entries(cart).map(([id,qty]) => {
+    const p = all().find(x => x.id===id);
+    return `<div class="order-item">
+      <span class="order-item-name">${p.name}</span>
+      <span class="order-item-qty">×${qty}</span>
+      <span class="order-item-price">฿${(p.price*qty).toLocaleString()}</span>
+    </div>`;
+  }).join('');
+
+  const discount = calcDiscount();
+  if (discount > 0) {
+    document.getElementById('modal-discount-row').style.display = 'flex';
+    document.getElementById('modal-discount-amount').textContent = `-฿${discount}`;
+  } else {
+    document.getElementById('modal-discount-row').style.display = 'none';
+  }
+  document.getElementById('modal-total').textContent = `฿${calcTotal().toLocaleString()}`;
+  document.getElementById('step-summary').style.display = 'block';
+  document.getElementById('step-success').classList.remove('show');
+  document.getElementById('modal-overlay').classList.add('open');
+};
+
+window.closeModal = () => {
+  document.getElementById('modal-overlay').classList.remove('open');
+};
+
+async function getNextOrderNumber() {
+  try {
+    const ref  = doc(db, 'meta', 'orderCounter');
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const next = (snap.data().count||0) + 1;
+      await updateDoc(ref, { count: next });
+      return String(next).padStart(3,'0');
+    } else {
+      await setDoc(ref, { count: 1 });
+      return '001';
+    }
+  } catch(e) {
+    return String(Math.floor(Math.random()*999)+1).padStart(3,'0');
+  }
+}
+
+window.submitOrder = async function() {
+  const name = document.getElementById('customer-name').value.trim();
+  if (!name) { alert('กรุณากรอกชื่อของคุณ'); return; }
+
+  const items    = Object.entries(cart).map(([id,qty]) => {
+    const p = all().find(x => x.id===id);
+    return { id, name:p.name, qty, price:p.price, subtotal:p.price*qty };
+  });
+  const discount  = calcDiscount();
+  const subtotal  = calcSubtotal();
+  const total     = calcTotal();
+  const orderNum  = await getNextOrderNumber();
+
+  try {
+    await addDoc(collection(db,'orders'), {
+      orderNumber: orderNum, customerName: name,
+      items, subtotal, discount, total,
+      paymentMethod: selectedPayment,
+      paid: false, status: 'pending',
+      createdAt: serverTimestamp()
+    });
+  } catch(e) { console.log('Firebase error', e); }
+
+  // Build receipt
+  let receiptHTML = items.map(i =>
+    `<div class="receipt-row"><span>${i.name} ×${i.qty}</span><span>฿${i.subtotal.toLocaleString()}</span></div>`
+  ).join('');
+  if (discount > 0) {
+    receiptHTML += `<div class="receipt-row discount"><span>🎉 ส่วนลดบริส</span><span>-฿${discount}</span></div>`;
+  }
+  receiptHTML += `<div class="receipt-row total"><span>ยอดรวม</span><span>฿${total.toLocaleString()}</span></div>`;
+  receiptHTML += `<div class="receipt-row payment-method"><span>วิธีชำระ</span><span>${selectedPayment==='cash' ? '💵 เงินสด' : '📱 QR Code'}</span></div>`;
+  document.getElementById('receipt-items').innerHTML = receiptHTML;
+
+  document.getElementById('success-order-num').textContent = `#${orderNum}`;
+  document.getElementById('success-msg').innerHTML =
+    selectedPayment === 'cash'
+      ? `ชำระเงินสดกับแม่ค้าได้เลยนะคะ 💵<br>สินค้าจัดส่งต้นเดือนถัดไป 📦`
+      : `โปรดโอนเงินและแจ้งแม่ค้าด้วยนะคะ 📱<br>สินค้าจัดส่งต้นเดือนถัดไป 📦`;
+
+  document.getElementById('step-summary').style.display = 'none';
+  document.getElementById('step-success').classList.add('show');
+
+  // Reset cart
+  Object.keys(cart).forEach(k => delete cart[k]);
+  document.querySelectorAll('.qty-num').forEach(el => el.textContent='0');
+  document.querySelectorAll('.qty-btn').forEach(el => { if(el.textContent==='−') el.disabled=true; });
+  updateFloatBar();
+};
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeModal();
+});
+
+renderGrid('detergent-grid', products.detergent);
+renderGrid('softener-grid', products.softener);
+updateFloatBar();
+</script>
+</body>
+</html>

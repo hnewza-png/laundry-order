@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — น้ำยา</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0284c7; --blue2: #0369a1; --blue-light: #e0f2fe;
+    --teal: #0d9488; --teal-light: #d1fae5;
+    --green: #10b981; --green-light: #d1fae5;
+    --red: #ef4444; --red-light: #fee2e2;
+    --orange: #f97316; --orange-light: #ffedd5;
+    --yellow: #f59e0b; --yellow-light: #fef3c7;
+    --purple: #a855f7; --purple-light: #f3e8ff;
+    --pink-dark: #be185d;
+    --bg: #f0f9ff; --card: #ffffff; --text: #0c4a6e; --muted: #7dd3fc; --border: #bae6fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mitr', sans-serif; background: var(--bg); color: var(--text); }
+
+  .header {
+    background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+    padding: 20px 16px; display:flex; align-items:center; gap:12px;
+  }
+  .header-icon { font-size: 28px; }
+  .header h1 { color: #fff; font-size: 18px; font-weight: 700; }
+  .header p  { color: rgba(255,255,255,0.6); font-size: 11px; }
+
+  /* TABS - scrollable */
+  .tabs-wrap { background:#fff; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:50; overflow-x:auto; }
+  .tabs { display:flex; min-width:max-content; }
+  .tab {
+    padding:12px 14px; text-align:center; font-size:12px; font-weight:600;
+    cursor:pointer; color:var(--muted); background:none; border:none;
+    border-bottom:3px solid transparent; transition:all 0.2s;
+    font-family:'Mitr',sans-serif; white-space:nowrap;
+  }
+  .tab.active { color:var(--blue2); border-bottom-color:var(--blue2); }
+
+  .container { max-width:480px; margin:0 auto; padding:12px 12px 80px; }
+
+  /* STATS */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
+  .stat-card { background:var(--card); border-radius:12px; padding:10px 6px; text-align:center; border:1px solid var(--border); }
+  .stat-num { font-size:18px; font-weight:700; }
+  .stat-label { font-size:9px; color:var(--muted); margin-top:1px; }
+  .stat-card.blue   .stat-num { color:var(--blue2); }
+  .stat-card.yellow .stat-num { color:var(--yellow); }
+  .stat-card.orange .stat-num { color:var(--orange); }
+  .stat-card.green  .stat-num { color:var(--green); }
+
+  /* ORDER CARD */
+  .order-card { background:var(--card); border-radius:16px; border:1.5px solid var(--border); margin-bottom:10px; overflow:hidden; transition:box-shadow 0.2s; }
+  .order-card:hover { box-shadow:0 4px 16px rgba(2,132,199,0.1); }
+  .order-header { padding:12px 14px; border-bottom:1px solid var(--border); }
+  .order-header-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px; }
+  .order-num  { font-size:15px; font-weight:700; color:var(--blue2); }
+  .order-name { font-size:13px; font-weight:600; margin-top:1px; color:var(--text); }
+  .order-time { font-size:10px; color:var(--muted); margin-top:2px; }
+
+  /* BADGES */
+  .badge-row { display:flex; gap:5px; flex-wrap:wrap; }
+  .badge {
+    font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px;
+    display:inline-flex; align-items:center; gap:3px;
+  }
+  .badge.cash      { background:var(--orange-light); color:#9a3412; }
+  .badge.qr        { background:var(--blue-light); color:var(--blue2); }
+  .badge.paid      { background:var(--green-light); color:#065f46; }
+  .badge.unpaid    { background:var(--yellow-light); color:#92400e; }
+  .badge.delivered { background:var(--teal-light); color:#0f766e; }
+  .badge.pending-d { background:#f3f4f6; color:#6b7280; }
+  .badge.done      { background:var(--green-light); color:#065f46; }
+  .badge.trash-b   { background:var(--red-light); color:#991b1b; }
+
+  /* ITEMS */
+  .order-items { padding:10px 14px; }
+  .order-item-row { display:flex; justify-content:space-between; font-size:12px; color:#64748b; padding:3px 0; font-family:'Sarabun',sans-serif; }
+  .discount-line { color:var(--green); font-weight:600; }
+  .order-total-row { display:flex; justify-content:space-between; font-size:14px; font-weight:700; padding:8px 14px; border-top:1px solid var(--border); background:var(--bg); }
+  .order-total-row span:last-child { color:var(--blue2); }
+
+  /* ACTIONS */
+  .order-actions { display:flex; gap:6px; padding:10px 14px; border-top:1px solid var(--border); flex-wrap:wrap; }
+  .action-btn {
+    flex:1; min-width:90px; padding:9px 6px; border-radius:12px; border:none;
+    font-size:11px; font-weight:600; font-family:'Mitr',sans-serif;
+    cursor:pointer; transition:all 0.2s; text-align:center;
+  }
+  .action-btn:hover { transform:translateY(-1px); opacity:0.9; }
+  .action-btn:active { transform:translateY(0); }
+
+  /* paid states */
+  .btn-pay-off  { background:var(--yellow-light); color:#92400e; border:1.5px solid #fcd34d; }
+  .btn-pay-on   { background:var(--green); color:#fff; box-shadow:0 2px 8px rgba(16,185,129,0.3); }
+  /* delivered states */
+  .btn-del-off  { background:var(--blue-light); color:var(--blue2); border:1.5px solid var(--border); }
+  .btn-del-on   { background:var(--teal); color:#fff; box-shadow:0 2px 8px rgba(13,148,136,0.3); }
+  /* trash/restore */
+  .btn-trash    { background:var(--red-light); color:#991b1b; border:1.5px solid #fca5a5; flex:0; min-width:40px; }
+  .btn-delete-perm { background:var(--red); color:#fff; box-shadow:0 2px 8px rgba(239,68,68,0.3); }
+
+  .empty-state { text-align:center; padding:48px 0; color:var(--muted); }
+  .empty-state .icon { font-size:48px; margin-bottom:8px; }
+  .empty-state p { font-size:13px; }
+  /* PIN SCREEN */
+  .pin-screen {
+    position: fixed; inset: 0; z-index: 999;
+    background: linear-gradient(160deg, #0284c7 0%, #0d9488 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .pin-screen.hidden { display: none; }
+  .pin-logo { font-size: 52px; margin-bottom: 8px; }
+  .pin-title { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .pin-sub { color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 32px; }
+  .pin-dots { display: flex; gap: 14px; margin-bottom: 32px; }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
+    background: transparent; transition: all 0.2s;
+  }
+  .pin-dot.filled { background: #fff; border-color: #fff; transform: scale(1.1); }
+  .pin-error { color: #fca5a5; font-size: 13px; font-weight: 600; margin-bottom: 16px; min-height: 20px; }
+  .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+  .pin-key {
+    background: rgba(255,255,255,0.15); border: none; border-radius: 16px;
+    padding: 18px; font-size: 22px; font-weight: 700; color: #fff;
+    cursor: pointer; transition: all 0.15s; font-family: 'Mitr', sans-serif;
+    backdrop-filter: blur(4px);
+  }
+  .pin-key:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+  .pin-key:active { transform: scale(0.95); }
+  .pin-key.del { font-size: 18px; }
+  .pin-key.empty { background: transparent; cursor: default; }
+  .pin-key.empty:hover { transform: none; }
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div style="background:#fef08a;color:#713f12;text-align:center;padding:6px;font-size:12px;font-weight:700;letter-spacing:1px">🛠️ DEV ENVIRONMENT</div>
+<div class="pin-screen" id="pin-screen">
+  <div class="pin-logo">🔐</div>
+  <div class="pin-title">Admin Panel</div>
+  <div class="pin-sub">กรอก PIN 4 หลักเพื่อเข้าใช้งาน</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="dot-0"></div>
+    <div class="pin-dot" id="dot-1"></div>
+    <div class="pin-dot" id="dot-2"></div>
+    <div class="pin-dot" id="dot-3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="pinPress('1')">1</button>
+    <button class="pin-key" onclick="pinPress('2')">2</button>
+    <button class="pin-key" onclick="pinPress('3')">3</button>
+    <button class="pin-key" onclick="pinPress('4')">4</button>
+    <button class="pin-key" onclick="pinPress('5')">5</button>
+    <button class="pin-key" onclick="pinPress('6')">6</button>
+    <button class="pin-key" onclick="pinPress('7')">7</button>
+    <button class="pin-key" onclick="pinPress('8')">8</button>
+    <button class="pin-key" onclick="pinPress('9')">9</button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinPress('0')">0</button>
+    <button class="pin-key del" onclick="pinDelete()">⌫</button>
+  </div>
+</div>
+
+<script>
+// PIN LOGIC (non-module, runs immediately)
+const CORRECT_PIN = '5665'; // ← เปลี่ยน PIN ตรงนี้
+let pinInput = '';
+
+function pinPress(num) {
+  if (pinInput.length >= 4) return;
+  pinInput += num;
+  document.getElementById(`dot-${pinInput.length - 1}`).classList.add('filled');
+  document.getElementById('pin-error').textContent = '';
+  if (pinInput.length === 4) {
+    setTimeout(checkPin, 200);
+  }
+}
+
+function pinDelete() {
+  if (pinInput.length === 0) return;
+  document.getElementById(`dot-${pinInput.length - 1}`).classList.remove('filled');
+  pinInput = pinInput.slice(0, -1);
+}
+
+function checkPin() {
+  if (pinInput === CORRECT_PIN) {
+    document.getElementById('pin-screen').classList.add('hidden');
+  } else {
+    document.getElementById('pin-error').textContent = '❌ PIN ไม่ถูกต้อง ลองใหม่อีกครั้ง';
+    pinInput = '';
+    document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
+  }
+}
+</script>
+
+<div class="header">
+  <div class="header-icon">🔧</div>
+  <div>
+    <h1>Admin Panel</h1>
+    <p>จัดการคำสั่งซื้อ</p>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('all')">📋 ทั้งหมด</button>
+    <button class="tab" onclick="switchTab('unpaid')">⏳ รอชำระ</button>
+    <button class="tab" onclick="switchTab('undelivered')">📦 รอจัดส่ง</button>
+    <button class="tab" onclick="switchTab('done')">✅ เสร็จสิ้น</button>
+    <button class="tab" onclick="switchTab('trash')">🗑️ ถังขยะ</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats-grid">
+    <div class="stat-card blue">  <div class="stat-num" id="stat-total">0</div>   <div class="stat-label">ทั้งหมด</div></div>
+    <div class="stat-card yellow"><div class="stat-num" id="stat-unpaid">0</div>  <div class="stat-label">รอชำระ</div></div>
+    <div class="stat-card orange"><div class="stat-num" id="stat-undel">0</div>   <div class="stat-label">รอส่ง</div></div>
+    <div class="stat-card green"> <div class="stat-num" id="stat-revenue">฿0</div><div class="stat-label">ยอดรวม</div></div>
+  </div>
+  <div id="orders-container"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, updateDoc, onSnapshot, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3QBRyrGkw3WEArcTsgjLf8t1zclEp2VU",
+  authDomain: "laundry-order-dev.firebaseapp.com",
+  projectId: "laundry-order-dev",
+  storageBucket: "laundry-order-dev.firebasestorage.app",
+  messagingSenderId: "623853854879",
+  appId: "1:623853854879:web:97cf5897111b71285ff34b"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+let allOrders = [];
+let currentTab = 'all';
+
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('th-TH', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function getFilteredOrders() {
+  const active = allOrders.filter(o => !o.deleted);
+  switch(currentTab) {
+    case 'all':         return active;
+    case 'unpaid':      return active.filter(o => !o.paid);
+    case 'undelivered': return active.filter(o => !o.delivered);
+    case 'done':        return active.filter(o => o.paid && o.delivered);
+    case 'trash':       return allOrders.filter(o => o.deleted);
+    default:            return active;
+  }
+}
+
+function renderOrderCard(o) {
+  const isTrash = o.deleted;
+
+  const items = (o.items||[]).map(i =>
+    `<div class="order-item-row"><span>${i.name} ×${i.qty}</span><span>฿${(i.subtotal||i.price*i.qty).toLocaleString()}</span></div>`
+  ).join('');
+  const discountLine = (o.discount > 0)
+    ? `<div class="order-item-row discount-line"><span>🎉 ส่วนลด</span><span>-฿${o.discount}</span></div>` : '';
+
+  const payBadge = o.paymentMethod==='cash'
+    ? `<span class="badge cash">💵 เงินสด</span>`
+    : `<span class="badge qr">📱 QR</span>`;
+
+  const paidBadge = o.paid
+    ? `<span class="badge paid">✅ ชำระแล้ว</span>`
+    : `<span class="badge unpaid">⏳ รอชำระ</span>`;
+
+  const deliveredBadge = o.delivered
+    ? `<span class="badge delivered">📦 ส่งแล้ว</span>`
+    : `<span class="badge pending-d">🕐 รอส่ง</span>`;
+
+  const doneBadge = (o.paid && o.delivered) ? `<span class="badge done">🎉 เสร็จสิ้น</span>` : '';
+
+  let actions = '';
+  if (isTrash) {
+    actions = `
+      <button class="action-btn btn-restore" onclick="restoreOrder('${o.id}')">↩️ กู้คืน</button>
+      <button class="action-btn btn-delete-perm" onclick="deleteForever('${o.id}')">🗑️ ลบถาวร</button>
+    `;
+  } else {
+    actions = `
+      <button class="action-btn ${o.paid ? 'btn-pay-on' : 'btn-pay-off'}"
+        onclick="togglePaid('${o.id}', ${!o.paid})">
+        ${o.paid ? '✅ ชำระแล้ว' : '💳 ยืนยันชำระ'}
+      </button>
+      <button class="action-btn ${o.delivered ? 'btn-del-on' : 'btn-del-off'}"
+        onclick="toggleDelivered('${o.id}', ${!o.delivered})">
+        ${o.delivered ? '📦 ส่งแล้ว' : '🚚 ยืนยันจัดส่ง'}
+      </button>
+      <button class="action-btn btn-trash" onclick="trashOrder('${o.id}')">🗑️</button>
+    `;
+  }
+
+  return `
+    <div class="order-card">
+      <div class="order-header">
+        <div class="order-header-top">
+          <div>
+            <div class="order-num">#${o.orderNumber||'???'}</div>
+            <div class="order-name">${o.customerName||'-'}</div>
+            <div class="order-time">${formatTime(o.createdAt)}</div>
+          </div>
+          <div class="badge-row">
+            ${payBadge}
+            ${isTrash ? '<span class="badge trash-b">🗑️ ลบ</span>' : ''}
+          </div>
+        </div>
+        <div class="badge-row">
+          ${!isTrash ? paidBadge : ''}
+          ${!isTrash ? deliveredBadge : ''}
+          ${doneBadge}
+        </div>
+      </div>
+      <div class="order-items">${items}${discountLine}</div>
+      <div class="order-total-row"><span>ยอดรวม</span><span>฿${(o.total||0).toLocaleString()}</span></div>
+      <div class="order-actions">${actions}</div>
+    </div>`;
+}
+
+function renderOrders() {
+  const filtered = getFilteredOrders();
+  const container = document.getElementById('orders-container');
+
+  if (filtered.length === 0) {
+    const emptyMsg = {
+      all: 'ยังไม่มีคำสั่งซื้อ',
+      unpaid: 'ไม่มี order รอชำระ 🎉',
+      undelivered: 'ไม่มี order รอจัดส่ง 🎉',
+      done: 'ยังไม่มี order เสร็จสิ้น',
+      trash: 'ถังขยะว่างเปล่า'
+    };
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>${emptyMsg[currentTab]||''}</p></div>`;
+  } else {
+    container.innerHTML = filtered.map(o => renderOrderCard(o)).join('');
+  }
+}
+
+function updateStats() {
+  const active = allOrders.filter(o => !o.deleted);
+  const unpaid = active.filter(o => !o.paid);
+  const undel  = active.filter(o => !o.delivered);
+  const revenue = active.filter(o => o.paid).reduce((s,o) => s+(o.total||0), 0);
+  document.getElementById('stat-total').textContent   = active.length;
+  document.getElementById('stat-unpaid').textContent  = unpaid.length;
+  document.getElementById('stat-undel').textContent   = undel.length;
+  document.getElementById('stat-revenue').textContent = `฿${revenue.toLocaleString()}`;
+}
+
+function listenOrders() {
+  const q = query(collection(db,'orders'), orderBy('createdAt','desc'));
+  onSnapshot(q, snap => {
+    allOrders = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderOrders();
+    updateStats();
+  });
+}
+
+window.togglePaid      = (id, paid)      => updateDoc(doc(db,'orders',id), { paid, status: paid?'confirmed':'pending' });
+window.toggleDelivered = (id, delivered) => updateDoc(doc(db,'orders',id), { delivered });
+window.trashOrder      = id => updateDoc(doc(db,'orders',id), { deleted: true });
+window.restoreOrder    = id => updateDoc(doc(db,'orders',id), { deleted: false });
+window.deleteForever   = async (id) => {
+  if (!confirm('ลบถาวรเลยนะ? กู้คืนไม่ได้แล้ว')) return;
+  const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await deleteDoc(doc(db,'orders',id));
+};
+
+window.switchTab = function(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('active', ['all','unpaid','undelivered','done','trash'][i]===tab);
+  });
+  renderOrders();
+};
+
+listenOrders();
+</script>
+</body>
+</html>
